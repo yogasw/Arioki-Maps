@@ -1,10 +1,34 @@
 import React, { Component } from "react";
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {Alert, AsyncStorage, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import firebase from 'firebase';
+import 'firebase/auth';
 
 export default class Register extends Component {
+    constructor(){
+        super();
+        this.state = {
+            email : ''
+        };
+    }
+
   hideModal(){
     this.props.hide();
+    this.state={
+        name : '',
+        email : '',
+        password : ''
+    }
   }
+    signUp(){
+        const {email, password} = this.state;
+        console.log(this.state);
+        firebase.auth().createUserWithEmailAndPassword(email,password)
+            .then((data) =>{
+                Alert.alert("Alert","Registration Success");
+            }).catch(e=>{
+            Alert.alert("Alert","Registration Error");
+        })
+    }
   render() {
     return (
       <TouchableOpacity onPress={() => this.hideModal()} activeOpacity={1} style={styles.container}>
@@ -16,13 +40,16 @@ export default class Register extends Component {
                 placeholder={"Name"}
                 underlineColorAndroid={"#ff0404"}
                 style={{ width: "70%" }}
+                onChangeText={(name) => this.setState({name}) }
               />
               <TextInput
-                placeholder={"Phone Number"}
+                placeholder={"Email"}
                 style={{ width: "70%" }}
+                onChangeText={(email) => this.setState({email}) }
               />
-              <TextInput placeholder={"Password"} style={{ width: "70%" }} />
-              <TouchableOpacity>
+              <TextInput placeholder={"Password"} style={{ width: "70%" }}
+                         onChangeText={(password) => this.setState({password}) }/>
+              <TouchableOpacity onPress={() => this.signUp()}>
                 <Text style={[styles.button, { marginTop: 10 }]}>Register</Text>
               </TouchableOpacity>
             </View>

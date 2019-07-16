@@ -15,13 +15,13 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import Welcome from '../Components/Welcome';
 import Login from '../Components/login';
 import Register from '../Components/Register';
 import Account from '../Components/Account';
-
+import firebase from 'firebase';
+import 'firebase/auth';
 export default class Home extends Component {
     constructor() {
         super();
@@ -32,6 +32,8 @@ export default class Home extends Component {
             modal: false,
             isModal: '',
             login: false,
+            email:'yoga@gmail.com',
+            password:'Yoga12345'
         };
     }
 
@@ -49,6 +51,9 @@ export default class Home extends Component {
         } else {
             this.showModal('welcome');
         }
+    }
+
+    componentDidMount(){
     }
 
     render() {

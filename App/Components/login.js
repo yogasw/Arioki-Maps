@@ -1,11 +1,33 @@
+import firebase from 'firebase';
 import React, { Component } from "react";
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, AppRegistry, AsyncStorage } from 'react-native';
+import "firebase/auth";
+import "firebase/database";
+
 
 export default class Login extends Component {
+    constructor(){
+        super();
+        this.state = {
+            email : ''
+        };
+
+        AsyncStorage.getItem('email', (error, result)=>{
+            if (result){
+                this.setState({name:result})
+            }
+        })
+    }
   hideModal(){
     this.props.hide();
   }
+  componentDidMount(){
+    console.log(firebase);
+  }
 
+  onLogin(email){
+
+  }
   render() {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.container} onPress={()=>this.hideModal()}>
@@ -14,7 +36,7 @@ export default class Login extends Component {
             <Text style={styles.textHeader}>Login</Text>
             <View style={{ marginTop: 20, alignItems: "center" }}>
               <TextInput placeholder={"Phone Number"} />
-              <TextInput placeholder={"Password"} />
+              <TextInput placeholder={"Password"}/>
               <TouchableOpacity>
                 <Text style={[styles.button, { marginTop: 10 }]}>Login</Text>
               </TouchableOpacity>
