@@ -13,7 +13,7 @@ import {
     Image,
     Modal,
     TouchableOpacity,
-    View,
+    View, AsyncStorage, FlatList,
 } from 'react-native';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import Welcome from '../Components/Welcome';
@@ -22,19 +22,22 @@ import Register from '../Components/Register';
 import Account from '../Components/Account';
 import firebase from 'firebase';
 import 'firebase/auth';
+import 'firebase/database';
+import {createDataUser} from '../Helper/Database';
+//import Chat from '../Components/Chat';
 export default class Home extends Component {
     constructor() {
         super();
         this.showModal =  this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
-
         this.state = {
             modal: false,
             isModal: '',
             login: false,
-            email:'yoga@gmail.com',
-            password:'Yoga12345'
+            data :{}
         };
+        this.getAllUser();
+
     }
 
     showModal(form) {
@@ -45,18 +48,31 @@ export default class Home extends Component {
         this.setState({modal: false});
     }
 
-    showAccount() {
-        if (this.state.login) {
+    async showAccount() {
+        let email = await AsyncStorage.getItem('email');
+        if (email!=null) {
             this.showModal('account');
         } else {
             this.showModal('welcome');
         }
     }
 
-    componentDidMount(){
+    writeUserData = () =>{
+        createDataUser("106","Yoga","yoga@gmail.com",'082329949292')
     }
-
+    getAllUser = async () =>{
+        const db = firebase.database();
+        const usersRef = db.ref("Users");
+        console.log(1);
+        await usersRef.on('value', snapshot=>{
+            let data = snapshot.val();
+            let item = Object.values(data);
+            this.setState({data:item});
+        });
+        this.setState({data:[1,2,3]});
+    }
     render() {
+        console.log(this.state.data);
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -94,7 +110,17 @@ export default class Home extends Component {
                     }}
                 />
                 <View style={styles.footer}>
-                    <View style={styles.iconFooter}/>
+                    <FlatList
+                        data={this.state.data}
+                        keyExtractor={this.keyExtractor}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({item, index}) =>
+                            <TouchableOpacity onPress={()=>this.showModal('chat')} style={{paddingRight:15}}>
+                                <View style={styles.iconFooter}/>
+                            </TouchableOpacity>
+                        }
+                    />
                 </View>
                 <Modal
                     animationType={'slide'}
@@ -105,6 +131,7 @@ export default class Home extends Component {
                     {(this.state.isModal=='welcome') && <Welcome modal={this.showModal} hide={this.hideModal}/> }
                     {(this.state.isModal=='register') && <Register modal={this.showModal} hide={this.hideModal}/> }
                     {(this.state.isModal=='account') && <Account modal={this.showModal} hide={this.hideModal}/> }
+                    {/*{(this.state.isModal=='chat') && <Chat modal={this.showModal} hide={this.hideModal}/> }*/}
                     {console.log(this.state)}
                 </Modal>
             </View>
