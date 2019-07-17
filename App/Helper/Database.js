@@ -24,3 +24,6 @@ exports.getDataUser = (uid) =>{
     return '';
 }
 
+exports.DB = () =>{
+}
+

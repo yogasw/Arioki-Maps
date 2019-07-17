@@ -2,47 +2,54 @@ import React, {Component} from 'react';
 import {Alert, AsyncStorage, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import firebase from 'firebase';
 import 'firebase/database';
+
 export default class Account extends Component {
     constructor() {
         super();
         this.state = {
-            uid: "",
-            data:""
+            uid: '',
+            data: '',
         };
         this.getUid();
     }
+
     getUid = async () => {
         await AsyncStorage.getItem('uid')
             .then(data => {
-                this.setState({uid:data})
+                this.setState({uid: data});
                 this.getData(data);
-            }).catch(e => {
-                console.log(e);
             });
     };
-    logout = async () =>{
+    logout = async () => {
 
         await firebase.auth().signOut()
-            .then(data =>{
-                AsyncStorage.clear()
-                Alert.alert('Alert')
-            }).catch(e=>{
-                Alert.alert("Error")
-                console.log(e)
+            .then(data => {
+                AsyncStorage.clear();
+                Alert.alert('Alert');
+            }).catch(e => {
+                Alert.alert('Error');
             });
-    }
+    };
+
     hideModal() {
         this.props.hide();
     }
 
-    getData = (uid) =>{
-        const usersRef = firebase.database().ref(`Users/${uid}`);
-        usersRef.on('value', snapshot =>{
-            let data = snapshot.val();
-            let item =  Object.values(data);
-            this.setState({data:item})
-        })
-    }
+    getData = (uid) => {
+        const db = firebase.database();
+        const usersRef = db.ref(`Users/${uid}`);
+
+        try {
+            usersRef.on('value', snapshot => {
+                let data = snapshot.val();
+                let item = Object.values(data);
+                this.setState({data: item});
+            });
+        } catch (e) {
+            this.setState({data: []});
+        }
+    };
+
     render() {
         return (
             <TouchableOpacity onPress={() => this.hideModal()} activeOpacity={1} style={styles.container}>
@@ -65,7 +72,7 @@ export default class Account extends Component {
                                 editable={false}
                                 style={{width: '70%'}}
                             />
-                            <TouchableOpacity onPress={()=>this.logout()}>
+                            <TouchableOpacity onPress={() => this.logout()}>
                                 <Text style={[styles.button, {marginTop: 10}]}>Logout</Text>
                             </TouchableOpacity>
                         </View>

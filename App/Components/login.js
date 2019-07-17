@@ -28,9 +28,6 @@ export default class Login extends Component {
                 });
 
                 await AsyncStorage.setItem(
-                    'email', this.state.email
-                );
-                await AsyncStorage.setItem(
                     'uid', this.state.uid
                 );
                 Alert.alert("sukses login");

@@ -13,7 +13,7 @@ import {
     Image,
     Modal,
     TouchableOpacity,
-    View, AsyncStorage, FlatList,
+    View, AsyncStorage, FlatList, KeyboardAvoidingView,
 } from 'react-native';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import Welcome from '../Components/Welcome';
@@ -24,7 +24,7 @@ import firebase from 'firebase';
 import 'firebase/auth';
 import 'firebase/database';
 import {createDataUser} from '../Helper/Database';
-//import Chat from '../Components/Chat';
+import Chat from '../Components/Chat';
 export default class Home extends Component {
     constructor() {
         super();
@@ -49,7 +49,7 @@ export default class Home extends Component {
     }
 
     async showAccount() {
-        let email = await AsyncStorage.getItem('email');
+        let email = await AsyncStorage.getItem('uid');
         if (email!=null) {
             this.showModal('account');
         } else {
@@ -58,12 +58,13 @@ export default class Home extends Component {
     }
 
     writeUserData = () =>{
-        createDataUser("106","Yoga","yoga@gmail.com",'082329949292')
+        createDataUser("QNAO4R6ilpgYSVFHqQ1EVfaZlzp1","Yoga","yoga@gmail.com",'082329949292')
     }
+
     getAllUser = async () =>{
         const db = firebase.database();
         const usersRef = db.ref("Users");
-        console.log(1);
+
         await usersRef.on('value', snapshot=>{
             let data = snapshot.val();
             let item = Object.values(data);
@@ -71,6 +72,7 @@ export default class Home extends Component {
         });
         this.setState({data:[1,2,3]});
     }
+
     render() {
         console.log(this.state.data);
         return (
@@ -127,12 +129,13 @@ export default class Home extends Component {
                     transparent={true}
                     visible={this.state.modal}
                     onRequestClose={() => this.hideModal()}>
+                    {/*<KeyboardAvoidingView behavior="padding">*/}
                     {(this.state.isModal=='login') && <Login modal={this.showModal} hide={this.hideModal} /> }
                     {(this.state.isModal=='welcome') && <Welcome modal={this.showModal} hide={this.hideModal}/> }
                     {(this.state.isModal=='register') && <Register modal={this.showModal} hide={this.hideModal}/> }
                     {(this.state.isModal=='account') && <Account modal={this.showModal} hide={this.hideModal}/> }
-                    {/*{(this.state.isModal=='chat') && <Chat modal={this.showModal} hide={this.hideModal}/> }*/}
-                    {console.log(this.state)}
+                    {(this.state.isModal=='chat') && <Chat modal={this.showModal} hide={this.hideModal}/> }
+                {/*</KeyboardAvoidingView>*/}
                 </Modal>
             </View>
         );

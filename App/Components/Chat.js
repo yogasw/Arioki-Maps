@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Alert, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Alert, FlatList, ScrollView, Text, TextInput, TouchableHighlight, TouchableOpacity, View} from 'react-native';
 import firebase from 'firebase';
 import 'firebase/auth';
 import {createDataUser} from '../Helper/Database';
@@ -9,6 +9,7 @@ export default class Register extends Component {
         super();
         this.state = {
             email: '',
+            chat: [1, 2, 3, 4, 1, 2, 3, 4],
         };
     }
 
@@ -23,30 +24,46 @@ export default class Register extends Component {
     }
 
     signUp() {
-        const {name,email, password,noPhone} = this.state;
+        const {name, email, password, noPhone} = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((data) => {
-                createDataUser(data.user.uid,name, email, noPhone)
+                createDataUser(data.user.uid, name, email, noPhone);
                 Alert.alert('Alert', 'Registration Success');
             }).catch(e => {
             Alert.alert('Alert', e.message);
         });
 
     }
+
     render() {
         return (
             <TouchableOpacity onPress={() => this.hideModal()} activeOpacity={1} style={styles.container}>
                 <TouchableOpacity activeOpacity={1}>
                     <View style={styles.form}>
                         <Text style={styles.textHeader}>Name</Text>
-                        <View style={styles.chat}>
-                            {/*<View style={styles.chatReciveText}>*/}
-                            {/*    <View style={styles.chatRecive}>*/}
-                            {/*        <Text>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer t</Text>*/}
-                            {/*    </View>*/}
-                            {/*    <View style={styles.photo}/>*/}
-                            {/*</View>*/}
-                        </View>
+                        <FlatList style={styles.chat} showsVerticalScrollIndicator={false} data={this.state.chat} renderItem={({item, index}) =>
+                            <TouchableHighlight>
+                                <View>
+                                <View>
+                                    <View style={styles.chatSend}>
+                                        <Text style={styles.chatTextSend}>Lorem Ipsum is simply dummy text of the
+                                            printing and
+                                            typesetting industry. Lorem Ipsum has been the industry's standard dummy
+                                            text ever
+                                            since the 1500s, when an unknown printer t</Text>
+                                    </View>
+                                    <View style={styles.margin}/>
+                                    <View style={styles.chatRev}>
+                                        <Text style={styles.chatTextRev}>Lorem Ipsum is simply dummy text of the printing and
+                                            typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever
+                                            since the 1500s, when an unknown printer t</Text>
+                                    </View>
+                                </View>
+                                    <View style={styles.margin}/>
+                                </View>
+                            </TouchableHighlight>
+                        }/>
+                        <TextInput multiline={true} placeholder={"input pesan anda"}/>
                     </View>
                 </TouchableOpacity>
             </TouchableOpacity>
@@ -60,26 +77,48 @@ const styles = {
         justifyContent: 'center',
     },
     form: {
-        height: 400,
-        width: 300,
-        backgroundColor: '#fff',
+        height: 450,
+        width: '90%',
+        backgroundColor: '#008dff',
         borderRadius: 20,
         padding: 20,
     },
     textHeader: {
+        color:"#fff",
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 20,
     },
-    photo:{
-        height: 45,
-        width: 45,
-        borderRadius:100,
-        backgroundColor: '#403bff'
+
+    chat: {
+        marginTop: 20,
+        flex: 1,
     },
-    chat:{marginTop: 5, flex :1, backgroundColor:"#f4f4f4", borderRadius:20, padding:20},
-    chatRecive:{
-      flexDirection:row
+    chatRev: {
+        backgroundColor: '#d25000',
+        justifyContet: 'space-between',
+        flexDirection: 'row',
+        borderRadius: 10,
+        borderBottomRightRadius: 0,
+        padding: 10,
+        marginRight: 40,
     },
-    chatReciveText:{}
+    chatTextRev: {
+        color: '#fff',
+    },
+    chatSend: {
+        backgroundColor: '#7b88ff',
+        justifyContet: 'space-between',
+        flexDirection: 'row',
+        borderRadius: 10,
+        borderBottomLeftRadius: 0,
+        padding: 10,
+        marginLeft: 40,
+    },
+    chatTextSend: {
+        color: '#fff',
+    },
+    margin: {
+        marginTop: 20,
+    },
 };
