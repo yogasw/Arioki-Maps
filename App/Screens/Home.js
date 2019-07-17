@@ -25,6 +25,7 @@ import 'firebase/auth';
 import 'firebase/database';
 import {createDataUser} from '../Helper/Database';
 import Chat from '../Components/Chat';
+
 export default class Home extends Component {
     constructor() {
         super();
@@ -34,14 +35,18 @@ export default class Home extends Component {
             modal: false,
             isModal: '',
             login: false,
-            data :{}
+            data :{},
+            item:{}
         };
         this.getAllUser();
-
     }
 
-    showModal(form) {
-        this.setState({modal: true, isModal: form});
+    showModal(form, item='') {
+        this.setState({
+            modal: true,
+            isModal: form,
+            item:item
+        });
     }
 
     hideModal() {
@@ -65,16 +70,24 @@ export default class Home extends Component {
         const db = firebase.database();
         const usersRef = db.ref("Users");
 
-        await usersRef.on('value', snapshot=>{
-            let data = snapshot.val();
-            let item = Object.values(data);
-            this.setState({data:item});
-        });
+        try {
+            await usersRef.on('value', snapshot=>{
+                let data = snapshot.val();
+                try{
+                    let item = Object.values(data);
+                    this.setState({data:item});
+                }catch (e) {
+
+                }
+            });
+        }catch (e) {
+            this.setState({data:[1,2,3]});
+        }
         this.setState({data:[1,2,3]});
     }
 
     render() {
-        console.log(this.state.data);
+        console.log(this.state.item);
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -118,7 +131,7 @@ export default class Home extends Component {
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}
                         renderItem={({item, index}) =>
-                            <TouchableOpacity onPress={()=>this.showModal('chat')} style={{paddingRight:15}}>
+                            <TouchableOpacity onPress={()=>this.showModal('chat', item)} style={{paddingRight:15}}>
                                 <View style={styles.iconFooter}/>
                             </TouchableOpacity>
                         }
@@ -134,7 +147,7 @@ export default class Home extends Component {
                     {(this.state.isModal=='welcome') && <Welcome modal={this.showModal} hide={this.hideModal}/> }
                     {(this.state.isModal=='register') && <Register modal={this.showModal} hide={this.hideModal}/> }
                     {(this.state.isModal=='account') && <Account modal={this.showModal} hide={this.hideModal}/> }
-                    {(this.state.isModal=='chat') && <Chat modal={this.showModal} hide={this.hideModal}/> }
+                    {(this.state.isModal=='chat') && <Chat modal={this.showModal} hide={this.hideModal} item={this.state.item}/> }
                 {/*</KeyboardAvoidingView>*/}
                 </Modal>
             </View>

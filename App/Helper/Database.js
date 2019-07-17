@@ -3,6 +3,7 @@ exports.createDataUser = (uid,name, email, noPhone) => {
     const db = Firebase.database();
     const usersRef = db.ref("Users");
     usersRef.child(uid).set({
+        uid:uid,
         name: name,
         email: email,
         noPhone: noPhone,
