@@ -26,6 +26,7 @@ export default class Register extends Component {
         const {name,email, password,noPhone} = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((data) => {
+                console.log(data);
                 createDataUser(data.user.uid,name, email, noPhone)
                 Alert.alert('Alert', 'Registration Success');
             }).catch(e => {
