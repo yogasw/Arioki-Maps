@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="527.678px" height="527.678px" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 29950 10509"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+
+ <g id="Layer_x0020_1">
+  <g id="_2480351469536">
+   <path d="M26920 1477l-22128 0 0 8095 25158 0 -3030 -1476 0 -6619z" fill="#43A047"/>
+   <path d="M26920 8096l3030 1476 0 -8095 -3030 -1477 0 8096z" fill="#81C784"/>
+   <path d="M10070 5474c0,2781 -2254,5035 -5035,5035 -2781,0 -5035,-2254 -5035,-5035 0,-2781 2254,-5035 5035,-5035 2781,0 5035,2254 5035,5035z" fill="#81C784"/>
+  </g>
+ </g>
+</svg>

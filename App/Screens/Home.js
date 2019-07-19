@@ -13,9 +13,9 @@ import {
     Image,
     Modal,
     TouchableOpacity,
-    View, AsyncStorage, FlatList, PermissionsAndroid, Button,
+    View, AsyncStorage, FlatList, PermissionsAndroid, Button, ToastAndroid,
 } from 'react-native';
-import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Marker, AnimatedRegion, Callout} from 'react-native-maps';
 import Welcome from '../Components/Welcome';
 import Login from '../Components/login';
 import Register from '../Components/Register';
@@ -36,18 +36,19 @@ export default class Home extends Component {
             modal: false,
             isModal: '',
             login: false,
-            data: {},
+            data: [],
             item: {},
             uid: '',
             latitude:0,
             longitude:0,
-            region: {
-                latitude: -6.175392,
-                longitude: 106.827153,
+            region: new AnimatedRegion({
+                latitude: -6.1753,
+                longitude: 106.8271,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
-            },
-            myLocation: null
+            }),
+            updateRegion:false
+
         };
         this.getAllUser();
         this.getUid();
@@ -68,6 +69,10 @@ export default class Home extends Component {
 
     hideModal() {
         this.setState({modal: false});
+    }
+
+    componentDidMount() {
+        this.requestAccess();
     }
 
     async showAccount() {
@@ -107,15 +112,10 @@ export default class Home extends Component {
                 }
             });
         } catch (e) {
-            this.setState({data: [1, 2, 3]});
+            console.log(e);
         }
-        this.setState({data: [1, 2, 3]});
+
     };
-
-    componentDidMount() {
-        this.requestAccess();
-    }
-
     requestAccess = async () => {
         try {
             console.log('1');
@@ -140,15 +140,12 @@ export default class Home extends Component {
                             longitudeDelta: 0.0421,
                         };
                         this.onRegionChange(region)
-                        this.setState({
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            error: null,
-                        });
-
                         },
-                    (error) => console.log('ERROR MAP',error),
-                    { enableHighAccuracy: true, timeout: 60000, maximumAge:0 },
+                    (error) => {
+                        console.log('ERROR MAP',error);
+                        ToastAndroid.show(error.message, ToastAndroid.SHORT);
+                    },
+                    { enableHighAccuracy: true, timeout: 60000,},
                 );
             } else {
                 console.log('5');
@@ -170,14 +167,22 @@ export default class Home extends Component {
     };
 
     onRegionChange = (region) => {
-        console.log("onRegionChange :", region)
         this.setState({region})
     }
+
+    shouldComponentUpdate(nextProps: Readonly<P>, nextState: Readonly<S>, nextContext: any): boolean {
+        console.log("next Props",nextProps);
+        console.log("nextState",nextState);
+        console.log("nextContext",nextContext);
+        return false;
+    }
+
     render() {
+        let data = this.state.data;
           console.log("STATE : ", this.state);
           (this.state.uid != '') &&  this.sendLocation(this.state.uid,{
-              latitude:this.state.latitude,
-              longitude:this.state.longitude
+              latitude:this.state.region.latitude,
+              longitude:this.state.region.longitude
           });
         return (
             <View style={styles.container}>
@@ -211,13 +216,61 @@ export default class Home extends Component {
                 </View>
                 <MapView
                     provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                    region={this.state.region}
+                    //initialRegion={this.state.region}
+                    ref={(mapView)=>{_mapView=mapView}}
                     style={{
                         flex: 1,
                     }}
-                    onUserLocationChange={this.onRegionChange}
-                    showsMyLocationButton={true}
-                />
+                >
+                    {(data) && data.map(data =>(
+                        ((data.location)&& <Marker
+                            coordinate={data.location}>
+                            <View style={{width:100}}>
+                                <View
+                                    style={{
+                                        backgroundColor:"#1976D2",
+                                        position:'absolute',
+                                        left:45,
+                                        marginRight:45,
+                                        borderRadius:10,
+                                }}>
+                                    <Text style={{color:'white', padding:5, textAlign:'center'}}>Yoga Setiawan</Text>
+                                </View>
+                                <View
+                                    style={{
+                                        borderRadius:100,
+                                        height:20,
+                                        width:20,
+                                        left:15,
+                                        top:5.2,
+                                        position:'absolute',
+                                        backgroundColor:'white',
+                                    zIndex:1}}>
+                                <Image
+                                    source={{uri: data.userProfile}}
+                                    style={{
+                                        height:10,
+                                        width:10,
+                                        left:5,
+                                        top:5,
+                                        alignContent:'center'
+                                    }}/>
+                                </View>
+                                <SvgUri
+                                    source={require('../Assets/location-marker-svgrepo-com.svg')}
+                                    height={50}
+                                    width={50}
+                                />
+                                <Callout tooltip>
+                                    <View style={{backgroundColor:'#FF1744'}}>
+                                        <SvgUri source={require('../Assets/tooltip.svg')} height={50} width={100}/>
+                                    </View>
+                                </Callout>
+                            </View>
+                        </Marker> )
+
+                    ))}
+                </MapView>
                 <View
                     style={{
                         zIndex:1,
@@ -227,7 +280,12 @@ export default class Home extends Component {
                         alignSelf: 'flex-end' //for align to right
                     }}
                 >
-                    <TouchableOpacity onPress={()=>this.requestAccess()}>
+                    <TouchableOpacity  onPress = {() => _mapView.animateToCoordinate({
+                        latitude: -6.1753,
+                        longitude: 106.8271,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }, 1000)}>
                     <SvgUri
                         source={require('../Assets/outline-gps_fixed-24px.svg')}
                         height={30}
@@ -242,7 +300,7 @@ export default class Home extends Component {
                 </View>
                 <View style={styles.footer}>
                     <FlatList
-                        data={this.state.data}
+                        data={this.state.data?this.state.data:[]}
                         keyExtractor={this.keyExtractor}
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}

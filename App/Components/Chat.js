@@ -35,7 +35,6 @@ export default class Register extends Component {
             });
     };
 
-
     sortUid(uidSend, uidRev){
         let ref = [uidSend, uidRev];
         ref.sort(function (a, b) {
@@ -84,6 +83,7 @@ export default class Register extends Component {
 
     render() {
         let data = this.props.item;
+        console.log(this.state)
         return (
             <TouchableOpacity onPress={() => this.hideModal()} activeOpacity={1} style={styles.container}>
                 <TouchableOpacity activeOpacity={1}>
@@ -92,7 +92,7 @@ export default class Register extends Component {
                         <FlatList
                             style={styles.chat}
                             showsVerticalScrollIndicator={false}
-                            data={this.state.data && this.state.data}
+                            data={this.state.data?this.state.data:[]}
                             renderItem={({item, index}) =>
                                 <TouchableHighlight>
                                     <View>
