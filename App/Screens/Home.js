@@ -27,7 +27,8 @@ import {createDataUser} from '../Helper/Database';
 import Chat from '../Components/Chat';
 import _ from 'lodash'
 import SvgUri from 'react-native-svg-uri';
-export default class Home extends Component {
+
+class Home extends Component {
     constructor() {
         super();
         this.showModal = this.showModal.bind(this);
@@ -41,14 +42,13 @@ export default class Home extends Component {
             uid: '',
             latitude:0,
             longitude:0,
-            region: new AnimatedRegion({
+            region:{
                 latitude: -6.1753,
                 longitude: 106.8271,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
-            }),
+            },
             updateRegion:false
-
         };
         this.getAllUser();
         this.getUid();
@@ -127,8 +127,6 @@ export default class Home extends Component {
                         'so we can show your location.'
                 }
             )
-
-            console.log('2');
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                 console.log('3');
                 await navigator.geolocation.getCurrentPosition(
@@ -143,6 +141,7 @@ export default class Home extends Component {
                         },
                     (error) => {
                         console.log('ERROR MAP',error);
+                        return this.state.region;
                         ToastAndroid.show(error.message, ToastAndroid.SHORT);
                     },
                     { enableHighAccuracy: true, timeout: 60000,},
@@ -150,18 +149,22 @@ export default class Home extends Component {
             } else {
                 console.log('5');
                 console.log("Location permission denied")
+                return this.state.region;
             }
         } catch (err) {
             console.log('6');
             console.warn(err)
+            return this.state.region;
         }
     }
 
-    sendLocation = async(ref, location) =>{
+    sendLocation = (ref, location, focus) =>{
         let db = firebase.database().ref(`Users/${ref}`);
-        db.update({location:location})
+        db.update({
+            location:location,
+            lastOnline:firebase.database.ServerValue.TIMESTAMP
+        })
             .then(result=>{
-
             }).catch(error => {
             })
     };
@@ -170,20 +173,21 @@ export default class Home extends Component {
         this.setState({region})
     }
 
-    shouldComponentUpdate(nextProps: Readonly<P>, nextState: Readonly<S>, nextContext: any): boolean {
-        console.log("next Props",nextProps);
-        console.log("nextState",nextState);
-        console.log("nextContext",nextContext);
-        return false;
+
+    componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS): void {
+        //this.requestAccess()
+
+       // _mapView.animateToCoordinate(this.state.region, 1000)
     }
 
     render() {
         let data = this.state.data;
-          console.log("STATE : ", this.state);
-          (this.state.uid != '') &&  this.sendLocation(this.state.uid,{
-              latitude:this.state.region.latitude,
-              longitude:this.state.region.longitude
-          });
+           // this.sendLocation(this.state.uid,{
+           //     latitude:this.state.region.latitude,
+           //     longitude:this.state.region.longitude,
+           //     latitudeDelta: 0.0922,
+           //     longitudeDelta: 0.0421,
+           // });
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -216,8 +220,12 @@ export default class Home extends Component {
                 </View>
                 <MapView
                     provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                    //initialRegion={this.state.region}
+                    initialRegion={this.props.navigation.getParam('region')}
                     ref={(mapView)=>{_mapView=mapView}}
+                    zoomControlEnabled={true}
+                    zoomEnabled={true}
+                    scrollEnabled={true}
+                    showsScale={true}
                     style={{
                         flex: 1,
                     }}
@@ -234,7 +242,7 @@ export default class Home extends Component {
                                         marginRight:45,
                                         borderRadius:10,
                                 }}>
-                                    <Text style={{color:'white', padding:5, textAlign:'center'}}>Yoga Setiawan</Text>
+                                    <Text style={{color:'white', padding:5, textAlign:'center'}}>{data.name}</Text>
                                 </View>
                                 <View
                                     style={{
@@ -247,7 +255,7 @@ export default class Home extends Component {
                                         backgroundColor:'white',
                                     zIndex:1}}>
                                 <Image
-                                    source={{uri: data.userProfile}}
+                                    //source={{uri: data.userProfile}}
                                     style={{
                                         height:10,
                                         width:10,
@@ -262,8 +270,22 @@ export default class Home extends Component {
                                     width={50}
                                 />
                                 <Callout tooltip>
-                                    <View style={{backgroundColor:'#FF1744'}}>
-                                        <SvgUri source={require('../Assets/tooltip.svg')} height={50} width={100}/>
+                                    <View style={{height:100, width:200}}>
+                                        <SvgUri
+                                            source={require('../Assets/outline-chat-24px.svg')}
+                                            height={40}
+                                            width={40}
+                                            style={{
+                                                position:'absolute',
+                                                top:40,
+                                                left:15,
+                                                zIndex:1
+                                            }}
+                                        />
+                                        <Text style={{position:'absolute', top:35, left:70, zIndex:1, color:"#fff"}}>{data.name}</Text>
+                                        <Text style={{position:'absolute', top:52, left:70, zIndex:1, color:"#fff"}}>{data.noPhone}</Text>
+                                        <Text style={{position:'absolute', top:69, left:70, zIndex:1, color:"#fff"}}>Palembang</Text>
+                                        <SvgUri source={require('../Assets/tooltip.svg')} height={120} width={200}/>
                                     </View>
                                 </Callout>
                             </View>
@@ -280,12 +302,9 @@ export default class Home extends Component {
                         alignSelf: 'flex-end' //for align to right
                     }}
                 >
-                    <TouchableOpacity  onPress = {() => _mapView.animateToCoordinate({
-                        latitude: -6.1753,
-                        longitude: 106.8271,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }, 1000)}>
+                    <TouchableOpacity  onPress = {() => {
+                        _mapView.animateCamera({ center: this.state.region})
+                    }}>
                     <SvgUri
                         source={require('../Assets/outline-gps_fixed-24px.svg')}
                         height={30}
@@ -306,7 +325,13 @@ export default class Home extends Component {
                         showsHorizontalScrollIndicator={false}
                         renderItem={({item, index}) =>
                             (this.state.uid != item.uid) && (
-                                <TouchableOpacity onPress={() => this.showModal('chat', item)} style={{paddingRight: 15}}>
+                                <TouchableOpacity onPress={() =>
+                                {
+                                    console.log('data region', item.location);
+                                    (item.location !== undefined) ?_mapView.animateToRegion(item.location):console.log("tidak ada");
+                                    //(item.location)?_mapView.animateToRegion(item.location):this.showModal('chat', item)
+                                }
+                                } style={{paddingRight: 15}}>
                                     <Image source={{uri: item.userProfile}} style={styles.iconFooter}/>
                                 </TouchableOpacity>
                             )
@@ -321,7 +346,7 @@ export default class Home extends Component {
                     {/*<KeyboardAvoidingView behavior="padding">*/}
                     {(this.state.isModal == 'login') && <Login modal={this.showModal} hide={this.hideModal}/>}
                     {(this.state.isModal == 'welcome') && <Welcome modal={this.showModal} hide={this.hideModal}/>}
-                    {(this.state.isModal == 'register') && <Register modal={this.showModal} hide={this.hideModal}/>}
+                    {(this.state.isModal == 'register') && <Register modal={this.showModal} hide={this.hideModal} region={this.state.region}/>}
                     {(this.state.isModal == 'account') && <Account modal={this.showModal} hide={this.hideModal}/>}
                     {(this.state.isModal == 'chat') &&
                     <Chat modal={this.showModal} hide={this.hideModal} item={this.state.item}/>}
@@ -331,6 +356,8 @@ export default class Home extends Component {
         );
     }
 }
+
+export default Home
 
 const styles = {
     container: {

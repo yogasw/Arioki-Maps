@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Alert, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Alert, PermissionsAndroid, Text, TextInput, ToastAndroid, TouchableOpacity, View} from 'react-native';
 import firebase from 'firebase';
 import 'firebase/auth';
 import {createDataUser} from '../Helper/Database';
@@ -22,12 +22,16 @@ export default class Register extends Component {
         };
     }
 
+    getLoc(){
+        return this.props.region;
+    }
+
     signUp() {
         const {name,email, password,noPhone} = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((data) => {
                 console.log(data);
-                createDataUser(data.user.uid,name, email, noPhone)
+                createDataUser(data.user.uid,name, email, noPhone, this.getLoc())
                 Alert.alert('Alert', 'Registration Success');
             }).catch(e => {
             Alert.alert('Alert', e.message);
@@ -35,6 +39,8 @@ export default class Register extends Component {
 
     }
     render() {
+        console.log("log param", this.getLoc());
+
         return (
             <TouchableOpacity onPress={() => this.hideModal()} activeOpacity={1} style={styles.container}>
                 <TouchableOpacity activeOpacity={1}>

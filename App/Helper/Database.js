@@ -1,5 +1,6 @@
 import Firebase from 'firebase';
-exports.createDataUser = (uid,name, email, noPhone) => {
+import firebase from '../Screens/Home';
+exports.createDataUser = (uid,name, email, noPhone, location) => {
     const db = Firebase.database();
     const usersRef = db.ref("Users");
     usersRef.child(uid).set({
@@ -7,7 +8,9 @@ exports.createDataUser = (uid,name, email, noPhone) => {
         name: name,
         email: email,
         noPhone: noPhone,
-        userProfile:''
+        userProfile:'https://namtrungsafety.com/wp-content/themes/namtrung/images/customer.png',
+        location:location,
+        lastOnline:Firebase.database.ServerValue.TIMESTAMP
     })
     return db;
 };

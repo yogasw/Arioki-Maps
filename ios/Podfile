@@ -33,6 +33,8 @@ target 'AriokiMapsNew' do
   pod 'react-native-maps', :path => '../node_modules/react-native-maps'
 
 
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
   target 'AriokiMapsNewTests' do
     inherit! :search_paths
     # Pods for testing
