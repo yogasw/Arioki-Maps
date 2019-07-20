@@ -48,8 +48,10 @@ export default class Login extends Component {
                         <View style={{marginTop: 20, alignItems: 'center'}}>
                             <TextInput placeholder={'Email'}
                             onChangeText={(email)=>this.setState({email})}/>
-                            <TextInput placeholder={'Password'}
-                                       onChangeText={(password)=>this.setState({password})}/>
+                            <TextInput
+                                secureTextEntry={true}
+                                placeholder={'Password'}
+                                onChangeText={(password)=>this.setState({password})}/>
                             <TouchableOpacity onPress={()=>this.onLogin()}>
                                 <Text style={[styles.button, {marginTop: 10}]}>Login</Text>
                             </TouchableOpacity>
