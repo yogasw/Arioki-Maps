@@ -200,12 +200,12 @@ class Home extends Component {
 
     render() {
         let data = this.state.data;
-           // this.sendLocation(this.state.uid,{
-           //     latitude:this.state.region.latitude,
-           //     longitude:this.state.region.longitude,
-           //     latitudeDelta: 0.0922,
-           //     longitudeDelta: 0.0421,
-           // });
+           this.sendLocation(this.state.uid,{
+               latitude:this.state.region.latitude,
+               longitude:this.state.region.longitude,
+               latitudeDelta: 0.0922,
+               longitudeDelta: 0.0421,
+           });
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
