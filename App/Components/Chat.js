@@ -92,7 +92,7 @@ export default class Register extends Component {
                         <FlatList
                             style={styles.chat}
                             showsVerticalScrollIndicator={false}
-                            data={this.state.data?this.state.data:[]}
+                            data={(this.state.data.length!=0)?this.state.data:[]}
                             renderItem={({item, index}) =>
                                 <TouchableHighlight>
                                     <View>

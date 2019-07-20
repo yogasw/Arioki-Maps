@@ -5,7 +5,7 @@
  * @format
  * @flow
  */
-
+import Config from 'react-native-config';
 import React, {Component} from 'react';
 import {
     Alert,
@@ -53,6 +53,7 @@ class Home extends Component {
         this.getAllUser();
         this.getUid();
         this.requestAccess()
+        //this.geoToAdress(-6.1753,106.8271)
     }
 
     async showModal(form, item = '') {
@@ -73,6 +74,23 @@ class Home extends Component {
 
     componentDidMount() {
         this.requestAccess();
+    }
+
+
+    geoToAdress(lat, long){
+
+        let address = 'https://api.opencagedata.com/geocode/v1/json?q=' + lat + '+' + long + '&key=' + Config.opencagedata_API_KEY;
+
+        fetch(address)
+            .then((response) =>{
+                console.log("ARIOKIMAPP",response.json());
+                console.log("ARIOKIMAPP",address);
+                return response.json()
+            })
+            .then((responseJson) => {
+                console.log("ARIOKIMAPP",'ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+                return "";
+            })
     }
 
     async showAccount() {
@@ -269,7 +287,7 @@ class Home extends Component {
                                     height={50}
                                     width={50}
                                 />
-                                <Callout tooltip>
+                                <Callout onPress={()=>this.showModal('chat',data)}tooltip>
                                     <View style={{height:100, width:200}}>
                                         <SvgUri
                                             source={require('../Assets/outline-chat-24px.svg')}
@@ -302,9 +320,7 @@ class Home extends Component {
                         alignSelf: 'flex-end' //for align to right
                     }}
                 >
-                    <TouchableOpacity  onPress = {() => {
-                        _mapView.animateCamera({ center: this.state.region})
-                    }}>
+                    <TouchableOpacity  onPress = {() => _mapView.animateToRegion(this.state.region)}>
                     <SvgUri
                         source={require('../Assets/outline-gps_fixed-24px.svg')}
                         height={30}
@@ -327,9 +343,7 @@ class Home extends Component {
                             (this.state.uid != item.uid) && (
                                 <TouchableOpacity onPress={() =>
                                 {
-                                    console.log('data region', item.location);
                                     (item.location !== undefined) ?_mapView.animateToRegion(item.location):console.log("tidak ada");
-                                    //(item.location)?_mapView.animateToRegion(item.location):this.showModal('chat', item)
                                 }
                                 } style={{paddingRight: 15}}>
                                     <Image source={{uri: item.userProfile}} style={styles.iconFooter}/>

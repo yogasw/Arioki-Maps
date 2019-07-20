@@ -15,6 +15,18 @@ exports.createDataUser = (uid,name, email, noPhone, location) => {
     return db;
 };
 
+
+exports.updateDataUser = (uid,name, noPhone, userProfile) => {
+    const db = Firebase.database();
+    const usersRef = db.ref("Users");
+    usersRef.child(uid).update({
+        name: name,
+        noPhone: noPhone,
+        userProfile:userProfile,
+    })
+    return db;
+};
+
 exports.getDataUser = (uid) =>{
     const db = Firebase.database();
     const usersRef = db.ref("Users");
