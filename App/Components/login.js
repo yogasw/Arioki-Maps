@@ -27,9 +27,11 @@ export default class Login extends Component {
                     uid:data.user.uid
                 });
 
+                console.log("UID LOGIN",this.state.uid);
                 await AsyncStorage.setItem(
                     'uid', this.state.uid
                 );
+                console.log("UID SETLLAH DI SINI : ", await AsyncStorage.getItem('uid'));
                 Alert.alert("sukses login");
             }).catch(e=>{
                 console.log(e);

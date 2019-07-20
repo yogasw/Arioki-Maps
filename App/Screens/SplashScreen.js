@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ActivityIndicator, PermissionsAndroid, Text, ToastAndroid, View} from 'react-native';
+import {ActivityIndicator, AsyncStorage, PermissionsAndroid, Text, ToastAndroid, View} from 'react-native';
 
 
 export default class SplashScreen extends Component {
@@ -9,13 +9,21 @@ export default class SplashScreen extends Component {
         super();
         this.state = {
             status:'',
+            uuid:'',
             region:[]
         };
     }
     componentDidMount() {
         this.requestAccess()
     }
-
+    async getUid() {
+        let uid = await AsyncStorage.getItem('uid');
+        if (uid != null) {
+            return uid;
+        } else {
+            return '';
+        }
+    }
     requestAccess = async () => {
         console.log("1")
         this.setState({status:"gps checking"});
@@ -42,7 +50,8 @@ export default class SplashScreen extends Component {
                         this.setState({status:"gps checking finish"});
                         this.setState({region:region})
                         this.props.navigation.navigate("Home", {
-                            region:region
+                            region:region,
+                            uid:this.getUid()
                         })
                     },
                     (error) => {
