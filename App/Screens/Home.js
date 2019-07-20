@@ -48,7 +48,6 @@ class Home extends Component {
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
             },
-            updateRegion: false,
         };
         //this.geoToAdress(-6.1753,106.8271)
     }
@@ -199,7 +198,6 @@ class Home extends Component {
     };
 
     sendLocation = (ref, location) => {
-        console.log("KIRIM DATA"+JSON.stringify(ref)+JSON.stringify(location))
         let db = firebase.database().ref(`Users/${ref}`);
         db.update({
             location: location,
@@ -281,7 +279,7 @@ class Home extends Component {
                     }}
                 >
                     {(data) && data.map(data => (
-                        ((data.location) && <Marker
+                        ((data.location && data.name) && <Marker
                             coordinate={data.location}>
                             <View style={{width: 100}}>
                                 <View
@@ -306,12 +304,12 @@ class Home extends Component {
                                         zIndex: 1,
                                     }}>
                                     <Image
-                                        //source={{uri: data.userProfile}}
+                                        source={{uri: data.userProfile}}
                                         style={{
-                                            height: 10,
-                                            width: 10,
-                                            left: 5,
-                                            top: 5,
+                                            height: 22,
+                                            width: 22,
+                                            left: -1,
+                                            top: -1.5,
                                             alignContent: 'center',
                                         }}/>
                                 </View>
@@ -397,8 +395,8 @@ class Home extends Component {
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}
                         renderItem={({item, index}) =>
-                            (this.state.uid != item.uid) && (
-                                <TouchableOpacity onPress={() => {
+                            (this.state.uid != item.uid && item.uid != '') && (
+                                (item.uid!=null) &&    <TouchableOpacity onPress={() => {
                                     (item.location !== undefined) ? _mapView.animateToRegion(item.location) : console.log('tidak ada');
                                 }
                                 } style={{paddingRight: 15}}>
